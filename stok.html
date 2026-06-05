@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Stok Bahan Ajar</title>
+
+  <!-- VUE JS -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="app" class="container">
+
+    <!-- TITLE -->
+    <h1>Stok Bahan Ajar UT</h1>
+
+    <!-- =======================================
+         FILTER SECTION
+    ======================================== -->
+    <div class="card">
+
+      <h3>Filter Data</h3>
+
+      <div class="grid-3">
+
+        <!-- FILTER UPBJJ -->
+        <div>
+
+          <label>UT Daerah</label>
+
+          <select v-model="filterUpbjj">
+
+            <option value="">
+              Semua
+            </option>
+
+            <option
+              v-for="u in upbjjList"
+            >
+              {{ u }}
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- FILTER KATEGORI -->
+        <div v-if="filterUpbjj">
+
+          <label>Kategori</label>
+
+          <select v-model="filterKategori">
+
+            <option value="">
+              Semua
+            </option>
+
+            <option
+              v-for="k in kategoriList"
+            >
+              {{ k }}
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- SORT -->
+        <div>
+
+          <label>Sort Data</label>
+
+          <select v-model="sortBy">
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="judul">
+              Judul
+            </option>
+
+            <option value="qty">
+              Stok
+            </option>
+
+            <option value="harga">
+              Harga
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <!-- CHECKBOX -->
+      <div class="mt">
+
+        <label>
+
+          <input
+            type="checkbox"
+            v-model="warningOnly"
+          >
+
+          Tampilkan hanya stok menipis/kosong
+
+        </label>
+
+      </div>
+
+      <!-- BUTTON -->
+      <button
+        @click="resetFilter"
+        class="btn-reset"
+      >
+        Reset Filter
+      </button>
+
+      <!--
+      <button
+        @click="restoreData"
+        class="btn-update"
+      >
+        Restore Data Awal
+      </button>
+      -->
+
+    </div>
+
+    <!-- =======================================
+         FORM SECTION
+    ======================================== -->
+    <div class="card">
+
+      <h3>Tambah / Edit Bahan Ajar</h3>
+
+      <div class="grid-3">
+
+        <!-- KODE -->
+        <input
+          type="text"
+          placeholder="Kode MK"
+          v-model="form.kode"
+        >
+
+        <!-- JUDUL -->
+        <input
+          type="text"
+          placeholder="Judul"
+          v-model="form.judul"
+        >
+
+        <!-- KATEGORI -->
+        <select v-model="form.kategori">
+
+          <option value="">
+            Pilih Kategori
+          </option>
+
+          <option
+            v-for="k in kategoriList"
+          >
+            {{ k }}
+          </option>
+
+        </select>
+
+        <!-- UPBJJ -->
+        <select v-model="form.upbjj">
+
+          <option value="">
+            Pilih UPBJJ
+          </option>
+
+          <option
+            v-for="u in upbjjList"
+          >
+            {{ u }}
+          </option>
+
+        </select>
+
+        <!-- RAK -->
+        <input
+          type="text"
+          placeholder="Lokasi Rak"
+          v-model="form.lokasiRak"
+        >
+
+        <!-- HARGA -->
+        <input
+          type="number"
+          placeholder="Harga"
+          v-model.number="form.harga"
+        >
+
+        <!-- QTY -->
+        <input
+          type="number"
+          placeholder="Qty"
+          v-model.number="form.qty"
+        >
+
+        <!-- SAFETY -->
+        <input
+          type="number"
+          placeholder="Safety Stock"
+          v-model.number="form.safety"
+        >
+
+      </div>
+
+      <!-- CATATAN -->
+      <textarea
+        v-model="form.catatanHTML"
+        placeholder="Catatan HTML"
+      >
+      </textarea>
+
+      <!-- BUTTON -->
+      <button
+        v-if="!isEdit"
+        @click="tambahData"
+        class="btn"
+      >
+        Tambah Data
+      </button>
+
+      <button
+        v-else
+        @click="updateData"
+        class="btn-update"
+      >
+        Simpan Perubahan
+      </button>
+
+    </div>
+
+    <!-- =======================================
+         TABLE SECTION
+    ======================================== -->
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Kode</th>
+          <th>Judul</th>
+          <th>Kategori</th>
+          <th>UPBJJ</th>
+          <th>Rak</th>
+          <th>Harga</th>
+          <th>Qty</th>
+          <th>Safety</th>
+          <th>Status</th>
+          <th>Catatan</th>
+          <th>Aksi</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr
+          v-for="s in filteredStok"
+          :key="s.kode"
+        >
+
+          <!-- KODE -->
+          <td>{{ s.kode }}</td>
+
+          <!-- JUDUL -->
+          <td>{{ s.judul }}</td>
+
+          <!-- KATEGORI -->
+          <td>{{ s.kategori }}</td>
+
+          <!-- UPBJJ -->
+          <td>{{ s.upbjj }}</td>
+
+          <!-- RAK -->
+          <td>{{ s.lokasiRak }}</td>
+
+          <!-- HARGA -->
+          <td>
+            Rp {{ s.harga.toLocaleString() }}
+          </td>
+
+          <!-- QTY -->
+          <td class="qty-text">
+            {{ s.qty }}
+          </td>
+
+          <!-- SAFETY -->
+          <td>{{ s.safety }}</td>
+
+          <!-- STATUS -->
+          <td>
+
+            <span
+              v-if="s.qty == 0"
+              class="danger"
+            >
+              ❌ Kosong
+            </span>
+
+            <span
+              v-else-if="s.qty < s.safety"
+              class="warning"
+            >
+              ⚠ Menipis
+            </span>
+
+            <span
+              v-else
+              class="safe"
+            >
+              ✔ Aman
+            </span>
+
+          </td>
+
+          <!-- CATATAN -->
+          <td v-html="s.catatanHTML"></td>
+
+          <!-- AKSI -->
+          <td>
+
+            <button
+              @click="editData(s)"
+              class="btn-edit"
+            >
+              Edit
+            </button>
+
+            <button
+              @click="hapus(s.kode)"
+              class="btn-delete"
+            >
+              Hapus
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <br>
+
+    <!-- BUTTON DASHBOARD -->
+    <a
+      href="dashboard.html"
+      class="btn-dashboard"
+    >
+      ← Kembali ke Dashboard
+    </a>
+
+  </div>
+
+  <!-- JS -->
+  <script src="js/stock-app.js"></script>
+
+  <!-- SWEET ALERT -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>

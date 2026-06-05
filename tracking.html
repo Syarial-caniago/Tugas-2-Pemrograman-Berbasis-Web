@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Tracking DO</title>
+
+  <!-- VUE JS -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div id="trackingApp" class="container">
+
+    <!-- TITLE -->
+    <h1>Tracking Delivery Order</h1>
+
+    <!-- WRAPPER -->
+    <div class="tracking-wrapper">
+
+      <!-- =======================================
+           FORM SECTION
+      ======================================== -->
+      <div class="tracking-left">
+
+        <div class="card">
+
+          <h3>Tambah Delivery Order</h3>
+
+          <div class="grid-2">
+
+            <!-- NOMOR DO -->
+            <div>
+              <label>Nomor DO</label>
+              <input
+                type="text"
+                v-model="nomorDO"
+                readonly
+              >
+            </div>
+
+            <!-- NIM -->
+            <div>
+              <label>NIM</label>
+              <input
+                type="text"
+                v-model="form.nim"
+              >
+            </div>
+
+            <!-- NAMA -->
+            <div>
+              <label>Nama</label>
+              <input
+                type="text"
+                v-model="form.nama"
+              >
+            </div>
+
+            <!-- EKSPEDISI -->
+            <div>
+              <label>Ekspedisi</label>
+
+              <select v-model="form.ekspedisi">
+
+                <option value="">
+                  Pilih
+                </option>
+
+                <option
+                  v-for="p in pengirimanList"
+                >
+                  {{ p.nama }}
+                </option>
+
+              </select>
+            </div>
+
+            <!-- PAKET -->
+            <div>
+              <label>Paket</label>
+
+              <select v-model="selectedPaketKode">
+
+                <option value="">
+                  Pilih Paket
+                </option>
+
+                <option
+                  v-for="p in paket"
+                  :value="p.kode"
+                >
+                  {{ p.kode }} - {{ p.nama }}
+                </option>
+
+              </select>
+            </div>
+
+            <!-- TANGGAL -->
+            <div>
+              <label>Tanggal Kirim</label>
+
+              <input
+                type="date"
+                v-model="form.tanggalKirim"
+              >
+            </div>
+
+          </div>
+
+          <!-- =======================================
+               DETAIL PAKET
+          ======================================== -->
+          <div
+            class="detail-paket-card mt"
+            v-if="selectedPaket"
+          >
+
+            <!-- HEADER -->
+            <div class="detail-header">
+
+              <h5>Detail Paket</h5>
+
+              <span class="badge-paket">
+                {{ selectedPaket.kode }}
+              </span>
+
+            </div>
+
+            <!-- NAMA PAKET -->
+            <div class="detail-item">
+
+              <label>Nama Paket</label>
+
+              <p>
+                {{ selectedPaket.nama }}
+              </p>
+
+            </div>
+
+            <!-- ISI PAKET -->
+            <div class="detail-item">
+
+              <label>Isi Paket</label>
+
+              <ul class="isi-paket">
+
+                <li
+                  v-for="i in selectedPaket.isi"
+                >
+                  {{ i }}
+                </li>
+
+              </ul>
+
+            </div>
+
+            <!-- TOTAL -->
+            <div class="detail-total">
+
+              <span>Total Harga</span>
+
+              <h4>
+                Rp {{ selectedPaket.harga.toLocaleString() }}
+              </h4>
+
+            </div>
+
+          </div>
+
+          <!-- BUTTON -->
+          <button
+            @click="tambahDO"
+            class="btn"
+          >
+            Tambah Delivery Order
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- =======================================
+           TRACKING SECTION
+      ======================================== -->
+      <div class="tracking-right">
+
+        <div class="card">
+
+          <h3>Daftar Tracking</h3>
+
+          <!-- TRACKING CARD -->
+          <div
+            class="tracking-card"
+            v-for="(item,key) in tracking"
+            :key="key"
+          >
+
+            <!-- NOMOR DO -->
+            <h3>{{ key }}</h3>
+
+            <!-- DATA -->
+            <p>
+              <strong>NIM:</strong>
+              {{ item.nim }}
+            </p>
+
+            <p>
+              <strong>Nama:</strong>
+              {{ item.nama }}
+            </p>
+
+            <p>
+              <strong>Status:</strong>
+              {{ item.status }}
+            </p>
+
+            <p>
+              <strong>Ekspedisi:</strong>
+              {{ item.ekspedisi }}
+            </p>
+
+            <p>
+              <strong>Paket:</strong>
+              {{ item.paket }}
+            </p>
+
+            <p>
+              <strong>Total:</strong>
+              Rp {{ item.total.toLocaleString() }}
+            </p>
+
+            <!-- HISTORY -->
+            <h4>Riwayat Pengiriman</h4>
+
+            <ul>
+
+              <li
+                v-for="p in item.perjalanan"
+              >
+                {{ p.waktu }} - {{ p.keterangan }}
+              </li>
+
+            </ul>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BUTTON KEMBALI -->
+    <a
+      href="dashboard.html"
+      class="btn-dashboard"
+    >
+      ← Kembali ke Dashboard
+    </a>
+
+  </div>
+
+  <!-- JS -->
+  <script src="js/tracking-app.js"></script>
+
+  <!-- SWEET ALERT -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>
